@@ -1,0 +1,47 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pynims"
+version = "0.1.0"
+description = "A Python package for interacting with the National Imagery Management System (NIMS)"
+readme = "README.md"
+requires-python = ">=3.6"
+license = {text = "MIT"}
+authors = [
+    {name = "Keegan Johnson", email = "keeganejohnson@usgs.gov"},
+]
+keywords = ["nims", "backend", "images", "upload", "download"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pytz",
+    "python-dateutil",
+    "httpx>=0.20.0",
+    "typer>=0.10.0",
+]
+
+[project.urls]
+Homepage = "https://code.usgs.gov/usgs-imagery-packages/pynims"
+
+[project.scripts]
+pynims = "pynims.cli:app"
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["pynims"]
+
+[dependency-groups]
+dev = [
+    "pytest>=7.0.1",
+]
+
