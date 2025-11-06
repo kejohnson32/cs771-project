@@ -1,0 +1,10 @@
+dataretrieval
+matplotlib
+opencv-python
+pillow
+pynims
+scikit-image
+sam2
+ipykernel
+
+# ./packages/pynims/ # install this manually instead with: pip install packages/pynims  
