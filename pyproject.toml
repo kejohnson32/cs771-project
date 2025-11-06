@@ -1,0 +1,24 @@
+[project]
+name = "deepwater"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "dataretrieval>=1.0.12",
+    "matplotlib>=3.10.7",
+    "opencv-python>=4.12.0.88",
+    "pillow>=12.0.0",
+    "pynims",
+    "sam-2",
+    "scikit-image>=0.25.2",
+]
+
+[tool.uv.sources]
+pynims = { path = "./packages/pynims" }
+sam-2 = { git = "https://github.com/facebookresearch/sam2.git" }
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.30.1",
+]
