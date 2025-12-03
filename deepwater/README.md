@@ -75,13 +75,13 @@ Both models achieve **sub-2-inch accuracy** with R² > 0.99!
 
 The Siamese model achieved the best results with an average error of less than 1 inch:
 
-![Siamese Model Predictions](/cs771-project/outputs/siamese_20251202_102942/predictions.png)
+![Siamese Model Predictions](/outputs/siamese_20251202_102942/predictions.png)
 
 ### Triplet Model Performance
 
 The Triplet model also performed well, though slightly behind Siamese on this dataset:
 
-![Triplet Model Predictions](/cs771-project/outputs/triplet_20251202_140534/triplet_predictions.png)
+![Triplet Model Predictions](/outputs/triplet_20251202_140534/triplet_predictions.png)
 
 ### Why Siamese Won
 
