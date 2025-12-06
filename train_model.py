@@ -19,11 +19,11 @@ elif torch.cuda.is_available():
     DEVICE = torch.device("cuda")
     print(f"🎮 Using CUDA GPU")
 else:
-    DEVICE = torch.device("cpu")
+    DEVICE = torch.device("cpu")    
     print(f"💻 Using CPU")
 
 # Import deepwater
-from deepwater.data import WaterLevelDataset, split_dataset, create_dataloaders
+# from deepwater.data import WaterLevelDataset, split_dataset, create_dataloaders
 from deepwater.models import create_model
 from deepwater.training import WaterLevelTrainer, create_optimizer, create_scheduler
 from deepwater.utils import evaluate_model, print_metrics, plot_predictions, count_parameters, format_parameters
