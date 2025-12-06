@@ -33,7 +33,18 @@ CAMERA_GAUGE_MAPPINGS = {
     'CA_Merced_River_at_Happy_Isles_Bridge_Yosemite': '11264500',
     'NE_Platte_River_near_Grand_Island': '06770500',
     'MA_Connecticut_River_near_Northfield': '01154500',
+
+    #7 New Cameras (Adding For Test 1 (12/6))
+    'MD_Deer_Creek_at_Eden_Mill_Dam_near_Pylesville' : '01579905',
+    'OR_Klamath_River_below_John_C_Boyle_Powerplant_near_Keno': '11510700',
+    'WI_Green_Bay_Oil_Depot': '040851385',
+    'NY_Cannonsville_Reservoir_Diversion_Channel_near_Grahamsville': '01365100',
+    'NJ_Middle_Brook_at_Burnt_Mills': '01399100',
+    'WI_Bark_River_near_Rome': '05426250',
+    'AK_Bradly_River_near_Tidewater_near_Homer': '15239070'
+
 }
+
 
 def collect_data_for_camera(cam_id, site_id, num_images=200):
     """Collect images and gauge data for a single camera."""
@@ -208,6 +219,13 @@ def main():
         ('WI_Yahara_River_at_McFarland_GATES', '05430500'),
         ('MN_Mississippi_River_Abv_37th_Ave_NE_in_Fridley', '05288500'),
         ('PA_Allegheny_River_at_Franklin', '03025500'),
+        ('MD_Deer_Creek_at_Eden_Mill_Dam_near_Pylesville' : '01579905'),
+        ('OR_Klamath_River_below_John_C_Boyle_Powerplant_near_Keno': '11510700'),
+        ('WI_Green_Bay_Oil_Depot': '040851385'),
+        ('NY_Cannonsville_Reservoir_Diversion_Channel_near_Grahamsville': '01365100'),
+        ('NJ_Middle_Brook_at_Burnt_Mills': '01399100'),
+        ('WI_Bark_River_near_Rome': '05426250'),
+        ('AK_Bradly_River_near_Tidewater_near_Homer': '15239070')
     ]
     
     all_data = []
