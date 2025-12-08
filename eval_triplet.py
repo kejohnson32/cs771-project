@@ -10,14 +10,14 @@ from PIL import Image
 
 print("Starting evaluation...")
 
-output_dir = Path('outputs/triplet_20251202_140534')
+output_dir = Path('outputs/triplet_20251208_013508')
 print(f'Loading from {output_dir}')
 
 checkpoint = torch.load(output_dir / 'best_model.pt', map_location='cpu', weights_only=False)
 
 model = create_model(model_type='triplet', backbone='vit_tiny_patch16_224', pretrained=False, feature_dim=192, hidden_dim=128)
 model.load_state_dict(checkpoint['model_state_dict'])
-model.to('mps')
+model.to('cuda')
 model.eval()
 
 elev_mean = float(checkpoint['elev_mean'])
@@ -30,6 +30,11 @@ print(f"Test samples: {len(test_df)}")
 transform = T.Compose([T.Resize((224, 224)), T.ToTensor(), T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
 
 all_preds, all_targets = [], []
+
+test_df["gage_height_ft"] = pd.to_numeric(test_df["gage_height_ft"])
+test_df = test_df.replace([np.inf, -np.inf], np.nan)
+test_df = test_df.dropna(subset=["gage_height_ft"]).reset_index(drop=True)
+
 n = len(test_df)
 
 print("Running inference...")
@@ -38,15 +43,15 @@ with torch.no_grad():
         i, j, k = np.random.randint(n), np.random.randint(n), np.random.randint(n)
         if i == j or j == k or i == k: 
             continue
-        
+
         r1, r2, q = test_df.iloc[i], test_df.iloc[j], test_df.iloc[k]
         
-        img1 = transform(Image.open(r1['image_paths']).convert('RGB')).unsqueeze(0).to('mps')
-        img2 = transform(Image.open(r2['image_paths']).convert('RGB')).unsqueeze(0).to('mps')
-        img3 = transform(Image.open(q['image_paths']).convert('RGB')).unsqueeze(0).to('mps')
+        img1 = transform(Image.open(r1['image_paths']).convert('RGB')).unsqueeze(0).to('cuda')
+        img2 = transform(Image.open(r2['image_paths']).convert('RGB')).unsqueeze(0).to('cuda')
+        img3 = transform(Image.open(q['image_paths']).convert('RGB')).unsqueeze(0).to('cuda')
         
-        e1 = torch.tensor([float((r1['gage_height_ft'] - elev_mean) / elev_std)], dtype=torch.float32).to('mps')
-        e2 = torch.tensor([float((r2['gage_height_ft'] - elev_mean) / elev_std)], dtype=torch.float32).to('mps')
+        e1 = torch.tensor([float((r1['gage_height_ft'] - elev_mean) / elev_std)], dtype=torch.float32).to('cuda')
+        e2 = torch.tensor([float((r2['gage_height_ft'] - elev_mean) / elev_std)], dtype=torch.float32).to('cuda')
         target = float(q['gage_height_ft'])
         
         pred_norm = model(img1, img2, img3, e1, e2)

@@ -20,6 +20,9 @@ os.environ['PYTORCH_MPS_HIGH_WATERMARK_RATIO'] = '0.0'
 if torch.backends.mps.is_available():
     DEVICE = torch.device("mps")
     print(f"🍎 Using M1 GPU (MPS)")
+elif torch.cuda.is_available():
+    DEVICE = torch.device("cuda")
+    print(f"Using CUDA GPU!")
 else:
     DEVICE = torch.device("cpu")
     print(f"💻 Using CPU")
@@ -41,6 +44,15 @@ class TripletDataset(torch.utils.data.Dataset):
         import torchvision.transforms as T
         
         self.df = pd.read_csv(csv_path)
+        print(f"Length before: {len(self.df)}")
+        nan_count = self.df['gage_height_ft'].isna().sum()
+        inf_count = np.isinf(self.df['gage_height_ft']).sum()    
+        print(f"We have {nan_count} nan values")
+        print(f"We have {inf_count} infinite values")
+        self.df['gage_height_ft'] = pd.to_numeric(self.df['gage_height_ft'])
+        self.df = self.df.replace([np.inf, -np.inf], np.nan)
+        self.df = self.df.dropna(subset=['gage_height_ft']).reset_index(drop=True)
+        print(f"Length after: {len(self.df)}")
         self.transform = T.Compose([
             T.Resize((224, 224)),
             T.ToTensor(),
@@ -95,6 +107,8 @@ class TripletDataset(torch.utils.data.Dataset):
         img1 = self.transform(img1)
         img2 = self.transform(img2)
         img3 = self.transform(img3)
+
+
         
         elev1 = (row1['gage_height_ft'] - self.elev_mean) / self.elev_std
         elev2 = (row2['gage_height_ft'] - self.elev_mean) / self.elev_std
@@ -106,6 +120,7 @@ class TripletDataset(torch.utils.data.Dataset):
             'elevation2': torch.tensor(elev2, dtype=torch.float32),
             'elevation_query': torch.tensor(elev3, dtype=torch.float32),
         }
+
 
 
 def main():
@@ -175,7 +190,9 @@ def main():
             targets = batch['elevation_query'].to(DEVICE)
             
             optimizer.zero_grad()
+
             preds = model(ref1, ref2, query, elev1, elev2)
+
             loss = F.mse_loss(preds, targets)
             loss.backward()
             optimizer.step()
@@ -230,7 +247,7 @@ def main():
     
     # Evaluate
     print('\n5. Evaluating...')
-    checkpoint = torch.load(output_dir / 'best_model.pt', map_location=DEVICE)
+    checkpoint = torch.load(output_dir / 'best_model.pt', map_location=DEVICE, weights_only=False)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
     
