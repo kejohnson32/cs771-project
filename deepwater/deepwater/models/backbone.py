@@ -29,10 +29,10 @@ class ViTBackbone(nn.Module):
     
     def __init__(
         self,
-        model_name: str = "vit_large_patch16_224",
+        model_name: str = "vit_huge_patch14_224",
         pretrained: bool = True,
         freeze_layers: int = 0,
-        output_dim: int = 1024,
+        output_dim: int = 1280,
     ):
         """
         Initialize ViT backbone.

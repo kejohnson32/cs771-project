@@ -41,7 +41,33 @@ CAMERA_GAUGE_MAPPINGS = {
     'NY_Cannonsville_Reservoir_Diversion_Channel_near_Grahamsville': '01365100',
     'NJ_Middle_Brook_at_Burnt_Mills': '01399100',
     'WI_Bark_River_near_Rome': '05426250',
-    'AK_Bradly_River_near_Tidewater_near_Homer': '15239070'
+    'AK_Bradly_River_near_Tidewater_near_Homer': '15239070',
+
+    #20 new cameras 
+    'VA_OPEQUON_CREEK_NEAR_BERRYVILLE': '01615000',
+    'CO_White_River_below_Boise_Creek_near_Rangely': '09306290',
+    'DC_Watts_Branch_at_Washington': '01651800',
+    'WA_Pend_Oreille_River_at_Newport': '12395500',
+    'ID_Lemhi_River_below_L5_Diversion_near_Salmon': '13305310',
+    'PA_Swatara_Creek_near_Palmyra': '01573208',
+    'TX_Elm_Fk_Trinity_Rv_nr_Lewisville': '08053000',
+    'NY_West_Branch_Croton_River_near_Croton_Falls': '01374701',
+    'LA_Buxton_Creek_at_Hwy_27_near_DeQuincy': '08016910',
+    'TX_New_Year_Ck_at_FM_1155_nr_Chappel_Hill': '08111110',
+    'SC_Congaree_River_below_Cayce_DOWNSTREAM_CAMERA': '021695075',
+    'CA_Threemile_Slough_Nr_Rio_Vista_CA': '11337080',
+    'LA_Black_River_at_Jonesville': '07373267',
+    'SC_Lake_Moultrie_Tailrace_Canal_at_Moncks_Corner': '02172002',
+    'NJ_Stony_Brook_at_Princeton': '01401000',
+    'PA_Swatara_Creek_near_Palmyra': '01573208',
+    'NJ_Great_Egg_Harbor_River_at_Folsom': '01411000',
+    'CA_Middle_River_at_Middle_River': '11312676',
+    'ID_Big_Wood_River_at_Hailey_Total_Flow': '13139510',
+    'KY_OHIO_R_US_OF_MCALPINE_DAM_AT_RRB_AT_LOUISVILLE': '03293551',
+    'VA_FLATLICK_BRANCH_ABOVE_FROG_BRANCH_AT_CHANTILLY': '01656903',
+    'OH_Maumee_River_near_Defiance': '04192500',
+    'UT_Weber_River_at_Gateway_UTAH': '10136500'
+
 
 }
 
@@ -225,7 +251,30 @@ def main():
         ('NY_Cannonsville_Reservoir_Diversion_Channel_near_Grahamsville', '01365100'),
         ('NJ_Middle_Brook_at_Burnt_Mills', '01399100'),
         ('WI_Bark_River_near_Rome', '05426250'),
-        ('AK_Bradly_River_near_Tidewater_near_Homer', '15239070')
+        ('AK_Bradly_River_near_Tidewater_near_Homer', '15239070'),
+        ('VA_OPEQUON_CREEK_NEAR_BERRYVILLE': '01615000'),
+        ('CO_White_River_below_Boise_Creek_near_Rangely': '09306290'),
+        ('DC_Watts_Branch_at_Washington': '01651800'),
+        ('WA_Pend_Oreille_River_at_Newport': '12395500'),
+        ('ID_Lemhi_River_below_L5_Diversion_near_Salmon': '13305310'),
+        ('PA_Swatara_Creek_near_Palmyra': '01573208'),
+        ('TX_Elm_Fk_Trinity_Rv_nr_Lewisville': '08053000'),
+        ('NY_West_Branch_Croton_River_near_Croton_Falls': '01374701'),
+        ('LA_Buxton_Creek_at_Hwy_27_near_DeQuincy': '08016910'),
+        ('TX_New_Year_Ck_at_FM_1155_nr_Chappel_Hill': '08111110'),
+        ('SC_Congaree_River_below_Cayce_DOWNSTREAM_CAMERA': '021695075'),
+        ('CA_Threemile_Slough_Nr_Rio_Vista_CA': '11337080'),
+        ('LA_Black_River_at_Jonesville': '07373267'),
+        ('SC_Lake_Moultrie_Tailrace_Canal_at_Moncks_Corner': '02172002'),
+        ('NJ_Stony_Brook_at_Princeton': '01401000'),
+        ('PA_Swatara_Creek_near_Palmyra': '01573208'),
+        ('NJ_Great_Egg_Harbor_River_at_Folsom': '01411000'),
+        ('CA_Middle_River_at_Middle_River': '11312676'),
+        ('ID_Big_Wood_River_at_Hailey_Total_Flow': '13139510'),
+        ('KY_OHIO_R_US_OF_MCALPINE_DAM_AT_RRB_AT_LOUISVILLE': '03293551'),
+        ('VA_FLATLICK_BRANCH_ABOVE_FROG_BRANCH_AT_CHANTILLY': '01656903'),
+        ('OH_Maumee_River_near_Defiance': '04192500'),
+        ('UT_Weber_River_at_Gateway_UTAH': '10136500')
     ]
     
     all_data = []
