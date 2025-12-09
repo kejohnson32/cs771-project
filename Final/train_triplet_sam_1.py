@@ -14,7 +14,7 @@ import json
 
 import numpy as np
 import pandas as pd
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 import torch
 import torch.nn as nn
@@ -41,6 +41,25 @@ elif torch.backends.mps.is_available():
 else:
     DEVICE = torch.device("cpu")
     print(" Using CPU")
+
+
+# =============================================================================
+# SAFE IMAGE LOADING
+# =============================================================================
+
+def safe_open_rgb_image(path: str, size=(224, 224)) -> Image.Image:
+    """
+    Safely open an image as RGB.
+    If the file is corrupted / unreadable / missing, returns a black RGB image.
+
+    This prevents PIL.UnidentifiedImageError from crashing the DataLoader.
+    """
+    try:
+        img = Image.open(path).convert("RGB")
+    except (UnidentifiedImageError, FileNotFoundError, OSError) as e:
+        print(f"[WARN] Could not open image '{path}': {e}. Using blank image instead.")
+        img = Image.new("RGB", size, (0, 0, 0))
+    return img
 
 
 # =============================================================================
@@ -275,8 +294,14 @@ class SameSiteTripletDatasetSAM(torch.utils.data.Dataset):
         print(f"Created {len(self.triplets)} triplets")
 
     def _load_image_with_mask(self, image_path: str) -> torch.Tensor:
-        """Load RGB image + SAM2 water mask, return normalized 4-channel tensor."""
-        img = Image.open(image_path).convert("RGB")
+        """
+        Load RGB image + SAM2 water mask, return normalized 4-channel tensor.
+
+        Uses safe_open_rgb_image(...) so that corrupted/missing images
+        do NOT crash training – they become black images instead.
+        """
+        # Safe RGB image load
+        img = safe_open_rgb_image(image_path, size=(224, 224))
         img_resized = self.resize(img)
         img_np = np.array(img_resized)
 
@@ -289,22 +314,32 @@ class SameSiteTripletDatasetSAM(torch.utils.data.Dataset):
         cache_path.parent.mkdir(parents=True, exist_ok=True)
 
         if self.cache_masks and cache_path.exists():
-            mask = np.load(cache_path)
+            try:
+                mask = np.load(cache_path)
+            except Exception as e:
+                print(f"[WARN] Failed to load mask cache '{cache_path}': {e}. Recomputing mask.")
+                mask = generate_water_mask(img_np, self.sam_predictor)
         else:
             mask = generate_water_mask(img_np, self.sam_predictor)
-            # Resize mask to 224x224 and normalize to [0,1]
-            mask = (
-                np.array(
-                    Image.fromarray((mask * 255).astype(np.uint8)).resize((224, 224))
-                )
-                / 255.0
-            ).astype(np.float32)
-            if self.cache_masks:
-                np.save(cache_path, mask)
 
-        img_tensor = self.to_tensor(img_resized)     # [3, H, W]
-        mask_tensor = torch.from_numpy(mask).unsqueeze(0)  # [1, H, W]
-        x4 = torch.cat([img_tensor, mask_tensor], dim=0)   # [4, H, W]
+        # Resize mask to 224x224 and normalize to [0,1]
+        try:
+            mask_img = Image.fromarray((mask * 255).astype(np.uint8))
+            mask_resized = mask_img.resize((224, 224))
+            mask = (np.array(mask_resized) / 255.0).astype(np.float32)
+        except Exception as e:
+            print(f"[WARN] Error processing mask for '{image_path}': {e}. Using all-ones mask.")
+            mask = np.ones((224, 224), dtype=np.float32)
+
+        if self.cache_masks:
+            try:
+                np.save(cache_path, mask)
+            except Exception as e:
+                print(f"[WARN] Could not save mask cache '{cache_path}': {e}")
+
+        img_tensor = self.to_tensor(img_resized)          # [3, H, W]
+        mask_tensor = torch.from_numpy(mask).unsqueeze(0) # [1, H, W]
+        x4 = torch.cat([img_tensor, mask_tensor], dim=0)  # [4, H, W]
         return self.normalize(x4)
 
     def __len__(self):
