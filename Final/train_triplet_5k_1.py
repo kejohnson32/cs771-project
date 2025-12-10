@@ -20,7 +20,7 @@ import timm
 
 import pandas as pd
 import numpy as np
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from tqdm import tqdm
 from torch.cuda.amp import autocast, GradScaler
 import matplotlib.pyplot as plt
@@ -127,6 +127,18 @@ class TripletWaterLevelModel(nn.Module):
         return pred
 
 
+def safe_open_image(path):
+    try:
+        return Image.open(path).convert("RGB")
+    except UnidentifiedImageError as e:
+        print(f"[WARN] Bad image, using blank instead: {path} ({e})")
+        # create a dummy black image; transforms will resize it anyway
+        return Image.new("RGB", (512, 512), (0, 0, 0))
+    except Exception as e:
+        print(f"[WARN] Error opening image {path}: {e}")
+        return Image.new("RGB", (512, 512), (0, 0, 0))
+
+
 # =============================================================================
 # DATASET
 # =============================================================================
@@ -222,9 +234,9 @@ class SameSiteTripletDataset(torch.utils.data.Dataset):
         row2 = site_df.iloc[j]
         row3 = site_df.iloc[k]
 
-        img1 = Image.open(row1["image_path"]).convert("RGB")
-        img2 = Image.open(row2["image_path"]).convert("RGB")
-        img3 = Image.open(row3["image_path"]).convert("RGB")
+        img1 = safe_open_image(row1["image_path"])
+        img2 = safe_open_image(row2["image_path"])
+        img3 = safe_open_image(row3["image_path"])
 
         img1 = self.transform(img1)
         img2 = self.transform(img2)

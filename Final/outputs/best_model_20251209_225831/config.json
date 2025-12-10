@@ -1,0 +1,10 @@
+{
+  "train_csv": "data/train_quality.csv",
+  "val_csv": "data/val_quality.csv",
+  "test_csv": "data/test_quality.csv",
+  "backbone": "vit_tiny_patch16_224",
+  "batch_size": 8,
+  "num_epochs": 30,
+  "learning_rate": 0.0001,
+  "max_triplets": 5000
+}

@@ -798,7 +798,7 @@ def train(config):
 
     # Test evaluation
     logger.info("\nEvaluating on test set...")
-    checkpoint = torch.load(output_dir / "best_model.pt", map_location=DEVICE)
+    checkpoint = torch.load(output_dir / "best_model.pt", map_location=DEVICE, weights_only=False)
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
 
