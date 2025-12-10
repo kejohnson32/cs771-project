@@ -1,0 +1,22 @@
+{
+  "model": "siamese_rgb",
+  "test_mae_ft": 1.820687371314103,
+  "test_mae_inches": 21.848248455769237,
+  "test_rmse_ft": 2.193720806171809,
+  "test_r2": -0.6555094401622148,
+  "test_pearson_r": -0.2072353769320024,
+  "train_samples": 28000,
+  "test_samples": 8000,
+  "config": {
+    "train_csv": "data/train_quality.csv",
+    "val_csv": "data/val_quality.csv",
+    "test_csv": "data/test_quality.csv",
+    "backbone": "vit_tiny_patch16_224",
+    "batch_size": 8,
+    "num_epochs": 30,
+    "learning_rate": 0.0001,
+    "weight_decay": 0.01,
+    "min_elev_diff": 0.2,
+    "max_pairs_per_site": 2000
+  }
+}
