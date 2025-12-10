@@ -1,0 +1,11 @@
+{
+  "model": "triplet_rgb",
+  "test_mae_ft": 0.30400797888012454,
+  "test_mae_inches": 3.6480957465614945,
+  "test_rmse_ft": 0.5227330431080188,
+  "test_r2": 0.9526337771144278,
+  "test_pearson_r": 0.9785687876809941,
+  "best_epoch": 9,
+  "train_samples": 5000,
+  "test_samples": 1500
+}
