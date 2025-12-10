@@ -27,14 +27,17 @@ import torchvision.transforms as T
 
 if torch.cuda.is_available():
     DEVICE = torch.device("cuda")
-    print(f" Using CUDA: {torch.cuda.get_device_name(0)}")
+    print(f" Using CUDA: {DEVICE}")
 elif torch.backends.mps.is_available():
     DEVICE = torch.device("mps")
     print(f" Using Apple MPS")
 else:
     DEVICE = torch.device("cpu")
     print(f" Using CPU")
-
+torch.backends.cuda.matmul.allow_tf32 = True
+torch.backends.cudnn.allow_tf32 = True
+torch.backends.cudnn.benchmark = True
+torch.set_float32_matmul_precision('high')
 # =============================================================================
 # MODEL
 # =============================================================================
@@ -51,8 +54,7 @@ class SiameseWaterLevelModel(nn.Module):
         
         # Get feature dimension from backbone
         with torch.no_grad():
-            dummy = torch.randn(1, 3, 224, 224)
-            backbone_dim = self.backbone(dummy).shape[1]
+            backbone_dim = self.backbone.num_features
         
         # Elevation embedding
         self.elev_embed = nn.Sequential(
@@ -106,6 +108,7 @@ class SameSitePairDataset(torch.utils.data.Dataset):
                  min_elev_diff=0.2, max_pairs_per_site=2000):
         
         self.df = pd.read_csv(csv_path)
+        
         print(f"Loaded {len(self.df)} samples from {csv_path}")
         
         # Clean data
@@ -179,14 +182,14 @@ class SameSitePairDataset(torch.utils.data.Dataset):
         img1 = self.transform(img1)
         img2 = self.transform(img2)
         
-        elev1 = (row1['gage_height_ft'] - self.elev_mean) / self.elev_std
-        elev2 = (row2['gage_height_ft'] - self.elev_mean) / self.elev_std
+        elev1 = torch.tensor((row1['gage_height_ft'] - self.elev_mean) / self.elev_std, dtype=torch.float32)
+        elev2 = torch.tensor((row2['gage_height_ft'] - self.elev_mean) / self.elev_std, dtype=torch.float32)
         
         return {
             'image1': img1,
             'image2': img2,
-            'elevation1': torch.tensor(elev1, dtype=torch.float32),
-            'elevation2': torch.tensor(elev2, dtype=torch.float32),
+            'elevation1': elev1,
+            'elevation2': elev2,
             'site': site,
         }
 
@@ -249,13 +252,13 @@ def train(config):
     )
     
     train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=0
+        train_dataset, batch_size=config['batch_size'], shuffle=True, num_workers=16, pin_memory=True, persistent_workers=True, prefetch_factor=4
     )
     val_loader = torch.utils.data.DataLoader(
-        val_dataset, batch_size=config['batch_size'], shuffle=False, num_workers=0
+        val_dataset, batch_size=config['batch_size'], shuffle=False, num_workers=16, pin_memory=True, persistent_workers=True, prefetch_factor=4
     )
     test_loader = torch.utils.data.DataLoader(
-        test_dataset, batch_size=config['batch_size'], shuffle=False, num_workers=0
+        test_dataset, batch_size=config['batch_size'], shuffle=False, num_workers=16, pin_memory=True, persistent_workers=True, prefetch_factor=4
     )
     
     # Create model
@@ -266,7 +269,7 @@ def train(config):
         hidden_dim=128,
         dropout=0.1
     )
-    model.to(DEVICE)
+    model.to(DEVICE, memory_format=torch.channels_last)
     
     n_params = sum(p.numel() for p in model.parameters())
     print(f'   Parameters: {n_params/1e6:.2f}M')
@@ -291,24 +294,28 @@ def train(config):
     best_val_mae = float('inf')
     history = []
     
-    for epoch in range(config['num_epochs']):
+    for epoch in range(1):
         # Train
         model.train()
         train_loss, train_mae, n = 0, 0, 0
         
         pbar = tqdm(train_loader, desc=f'Epoch {epoch+1}/{config["num_epochs"]}')
+        scaler = torch.cuda.amp.GradScaler()
+        torch.compile(model) 
         for batch in pbar:
-            img1 = batch['image1'].to(DEVICE)
-            img2 = batch['image2'].to(DEVICE)
-            elev1 = batch['elevation1'].to(DEVICE)
-            targets = batch['elevation2'].to(DEVICE)
+            img1 = batch['image1'].to(DEVICE, non_blocking=True)
+            img2 = batch['image2'].to(DEVICE, non_blocking=True)
+            elev1 = batch['elevation1'].to(DEVICE, non_blocking=True)
+            targets = batch['elevation2'].to(DEVICE, non_blocking=True)
             
-            optimizer.zero_grad()
-            preds = model(img1, img2, elev1)
-            loss = F.mse_loss(preds, targets)
-            loss.backward()
-            optimizer.step()
-            
+            optimizer.zero_grad(set_to_none=True)
+            with torch.cuda.amp.autocast(dtype=torch.float16):
+              preds = model(img1, img2, elev1)
+              loss = F.mse_loss(preds, targets)
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
+
             bs = targets.size(0)
             train_loss += loss.item() * bs
             train_mae += F.l1_loss(preds, targets, reduction='sum').item()
@@ -365,7 +372,7 @@ def train(config):
     
     # Test evaluation
     print('\n Evaluating on TEST set (unseen sites)...')
-    checkpoint = torch.load(output_dir / 'best_model.pt', map_location=DEVICE)
+    checkpoint = torch.load(output_dir / 'best_model.pt', map_location=DEVICE, weights_only=False)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
     
@@ -373,9 +380,9 @@ def train(config):
     
     with torch.no_grad():
         for batch in test_loader:
-            img1 = batch['image1'].to(DEVICE)
-            img2 = batch['image2'].to(DEVICE)
-            elev1 = batch['elevation1'].to(DEVICE)
+            img1 = batch['image1'].to(DEVICE, non_blocking=True)
+            img2 = batch['image2'].to(DEVICE, non_blocking=True)
+            elev1 = batch['elevation1'].to(DEVICE, non_blocking=True)
             
             preds = model(img1, img2, elev1)
             test_preds.extend(preds.cpu().numpy())
