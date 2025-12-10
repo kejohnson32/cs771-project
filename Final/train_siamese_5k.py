@@ -294,7 +294,7 @@ def train(config):
     best_val_mae = float('inf')
     history = []
     
-    for epoch in range(1):
+    for epoch in range(config['num_epochs']):
         # Train
         model.train()
         train_loss, train_mae, n = 0, 0, 0

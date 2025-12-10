@@ -447,7 +447,7 @@ def train(config):
     print('\n Training...')
     best_val_mae = float('inf')
     
-    for epoch in range(1):#(config['num_epochs']):
+    for epoch in range(config['num_epochs']):#(config['num_epochs']):
         model.train()
         train_loss, train_mae, n = 0, 0, 0
         
