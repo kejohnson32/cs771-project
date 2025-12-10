@@ -1,16 +1,5 @@
 {
-  "model": "triplet_rgb",
-  "test_mae_ft": 1.7334223595507057,
-  "test_mae_inches": 20.801068314608468,
-  "test_rmse_ft": 2.1041446150755627,
-  "test_r2": -0.41706156752171997,
-  "n_test_samples": 200,
-  "test_sites": [
-    "CA_Threemile_Slough_Nr_Rio_Vista_CA",
-    "DC_Watts_Branch_at_Washington",
-    "MA_Connecticut_River_near_Northfield",
-    "WI_Red_Cedar_River_near_Colfax"
-  ],
-  "elev_mean": 5.405157491904622,
-  "elev_std": 2.8598242139972876
+  "mae_ft": 1.6604829923520372,
+  "rmse_ft": 2.1041398683937325,
+  "r2": -0.4072196482425072
 }

@@ -1,0 +1,12 @@
+{
+  "train_csv": "data/train_mixed.csv",
+  "val_csv": "data/val_mixed.csv",
+  "test_csv": "data/test_mixed.csv",
+  "backbone": "vit_tiny_patch16_224",
+  "batch_size": 16,
+  "num_epochs": 15,
+  "learning_rate": 0.0001,
+  "weight_decay": 0.01,
+  "min_elev_diff": 0.3,
+  "max_triplets": 5000
+}
