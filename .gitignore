@@ -54,6 +54,9 @@ outputs/*
 !outputs/results/
 !outputs/results/**
 
+# Keep the evaluation results folder
+!outputs/eval_results/
+!outputs/eval_results/**
 
 ############################
 # MODELS
