@@ -1,10 +1,23 @@
-dataretrieval
-matplotlib
-opencv-python
-pillow
-pynims
-scikit-image
-sam2
-ipykernel
+# DeepWater - Requirements
+# Install with: pip install -r requirements.txt
 
-# ./packages/pynims/ # install this manually instead with: pip install packages/pynims  
+# Core ML
+torch>=2.0.0
+torchvision>=0.15.0
+timm>=0.9.0
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.24.0
+pillow>=9.0.0
+
+# USGS data retrieval
+requests>=2.28.0
+
+# Visualization
+matplotlib>=3.7.0
+tqdm>=4.65.0
+
+# Optional: SAM2 for water segmentation
+# git clone https://github.com/facebookresearch/segment-anything-2.git sam2
+# cd sam2 && pip install -e .

@@ -1,22 +1,82 @@
-# Virtual environment
+############################
+# PYTHON
+############################
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+############################
+# ENV
+############################
 .venv/
 venv/
-env/
 
-# Data files
-data/
-
-# Model weights
-*.pt
-*.pth
-
-# Zip files
-*.zip
-
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-
-# Mac
+############################
+# OS FILES
+############################
 .DS_Store
+
+############################
+# NOTEBOOKS
+############################
+*.ipynb
+
+############################
+# DATA (IMPORTANT)
+############################
+
+# Ignore EVERYTHING inside data/
+data/*
+
+# BUT keep only the 5 CSVs we need
+!data/train_quality.csv
+!data/val_quality.csv
+!data/test_quality.csv
+!data/seen_eval.csv
+!data/unseen_eval.csv
+
+# Always ignore heavy images
+data/*/images/
+data/*/images/**
+
+############################
+# OUTPUTS
+############################
+# Ignore everything in outputs by default
+outputs/*
+
+# But keep plots + results JSON
+!outputs/*.png
+!outputs/*.json
+
+# Keep the entire results folder
+!outputs/results/
+!outputs/results/**
+
+
+############################
+# MODELS
+############################
+models/*
+!models/**/*.pt
+!models/*.pt
+
+############################
+# MISC
+############################
+*.zip
+*.tar.gz
+*.tmp
+
+############################
+# RAW DATA FOLDERS TO IGNORE
+############################
+Final/data/
+deepwater/deepwater/data/
+sam2/
+milestones_integration.zip
+
+# Do not track experimental training scripts
+train_triplet_5k.py
+train_triplet_sam_1.py
