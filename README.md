@@ -8,7 +8,7 @@ A computer vision system for estimating water levels from USGS monitoring camera
 - Elice Priyadarshini (epriyadarshi@wisc.edu)
 - Jeffrey Weisinger (jweisinger@wisc.edu)
 
-University of Wisconsin-Madison | CS771 Machine Learning | Fall 2024
+University of Wisconsin-Madison | CS771 Machine Learning | Fall 2025
 
 ## Project Overview
 
