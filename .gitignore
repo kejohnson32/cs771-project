@@ -1,3 +1,22 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Data files
+data/
+
+# Model weights
+*.pt
+*.pth
+
+# Zip files
+*.zip
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Mac
 .DS_Store
-notebooks/*/
-checkpoints/*

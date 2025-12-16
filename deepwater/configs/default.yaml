@@ -1,0 +1,89 @@
+# DeepWater Configuration
+# Water Level Estimation from Imagery
+
+data:
+  data_root: "data"
+  images_subdir: "images"
+  masks_subdir: "masks"
+  max_time_diff_seconds: 60
+  min_images_per_site: 100
+  min_elevation_range_ft: 1.0
+
+model:
+  # Model type: "siamese" (2 images) or "triplet" (3 images)
+  model_type: "siamese"
+  
+  # Backbone options:
+  # - vit_tiny_patch16_224 (5.7M params, fastest)
+  # - vit_small_patch16_224 (22M params)
+  # - vit_base_patch16_224 (86M params, recommended)
+  # - resnet50 (25M params, lower memory)
+  backbone: "vit_small_patch16_224"
+  
+  pretrained: true
+  freeze_backbone: false
+  
+  # Architecture
+  image_size: 224
+  embed_dim: 384  # Match backbone: tiny=192, small=384, base=768
+  projection_dim: 192
+  num_heads: 8
+  dropout: 0.1
+  
+  # Output
+  output_type: "regression"
+  num_classes: 5  # Only for classification
+
+training:
+  # Batch size - adjust based on GPU memory
+  # - RTX 3090/4090 (24GB): batch_size 32
+  # - RTX 3080 (10GB): batch_size 16
+  # - Colab T4 (16GB): batch_size 16-24
+  # - Colab A100 (40GB): batch_size 48-64
+  batch_size: 16
+  
+  num_epochs: 100
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  
+  # Learning rate schedule
+  lr_scheduler: "cosine"
+  warmup_epochs: 5
+  min_lr: 0.000001
+  
+  # Optimization
+  optimizer: "adamw"
+  gradient_clip: 1.0
+  
+  # Data splits
+  train_ratio: 0.7
+  val_ratio: 0.15
+  test_ratio: 0.15
+  num_workers: 4
+  
+  # Augmentation
+  use_augmentation: true
+  
+  # Checkpointing
+  save_every_n_epochs: 10
+  checkpoint_dir: "checkpoints"
+  
+  # Logging
+  log_every_n_steps: 10
+  use_wandb: false
+  wandb_project: "deepwater"
+  
+  # Early stopping
+  early_stopping_patience: 15
+  early_stopping_min_delta: 0.001
+  
+  # Mixed precision (recommended for speed)
+  use_amp: true
+  
+  # Device: "auto", "cuda", "mps", "cpu"
+  device: "auto"
+
+inference:
+  model_path: ""
+  batch_size: 32
+  device: "auto"
